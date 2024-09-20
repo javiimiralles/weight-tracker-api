@@ -1,0 +1,13 @@
+# Excluir todos los tipos de imágenes
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.ico
+
+# Excluir la carpeta node_modules
+node_modules/
+
+# Excluir el .env
+.env
