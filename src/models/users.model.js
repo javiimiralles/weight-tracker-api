@@ -1,7 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { GenderEnum } from '../enums/gender.enum.js';
 
-const UsersSchema = Schema(
+const UserSchema = Schema(
     {
         username: {
             type: String,
@@ -32,9 +32,9 @@ const UsersSchema = Schema(
     }, { collection: 'users' }
 )
 
-UsersSchema.method('toJSON', function(){
+UserSchema.method('toJSON', function(){
     const { __v, password, ...object } = this.toObject();
     return object;
 });
 
-export default model('User', UsersSchema);
+export default model('User', UserSchema);

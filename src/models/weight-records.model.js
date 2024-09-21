@@ -1,6 +1,6 @@
 import { Schema, model } from 'mongoose';
 
-const WeightRecordsSchema = Schema(
+const WeightRecordSchema = Schema(
     {
         date: {
             type: Date,
@@ -18,9 +18,9 @@ const WeightRecordsSchema = Schema(
     }, { collection: 'users' }
 )
 
-WeightRecordsSchema.method('toJSON', function(){
+WeightRecordSchema.method('toJSON', function(){
     const { __v, ...object } = this.toObject();
     return object;
 });
 
-export default model('WeightRecords', WeightRecordsSchema);
+export default model('WeightRecord', WeightRecordSchema);

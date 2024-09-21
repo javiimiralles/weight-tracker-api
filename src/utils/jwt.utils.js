@@ -20,3 +20,7 @@ export const generateJWT = (uid) => {
         });
     });
 }
+
+export const infoToken = (token) => {
+    return jwt.verify(token, process.env.JWT_SECRET);
+}
