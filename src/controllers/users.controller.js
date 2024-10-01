@@ -6,10 +6,20 @@ import { HttpStatusCodeEnum } from '../enums/http-status-code.enum.js';
 
 export const createUser = async(req, res = response) => {
 
-    const { username, password } = req.body;
+    const { email, username, password, ...object } = req.body;
 
     try{
-        const userDB = await User.findOne({ username });
+        let userDB = await User.findOne({ email });
+
+        // KO -> existe un usuario con ese email
+        if(userDB){
+            return  res.status(HttpStatusCodeEnum.BAD_REQUEST).json({
+                ok: false,
+                msg:"Ya existe un usuario con este email"
+            })
+        }
+
+        userDB = await User.findOne({ username });
 
         // KO -> existe un usuario con ese nombre
         if(userDB){
@@ -22,9 +32,10 @@ export const createUser = async(req, res = response) => {
         const salt = bcrypt.genSaltSync();
         const cpassword = bcrypt.hashSync(password, salt);
 
-        const object = req.body;
         const user = new User(object);
         user.password = cpassword;
+        user.username = username;
+        user.email = email;
 
         await user.save();
 
@@ -45,29 +56,40 @@ export const createUser = async(req, res = response) => {
 
 export const updateUser = async(req, res = response) => {
 
-    const { password, username, ...object } = req.body;
+    const { password, username, email, ...object } = req.body;
     const id = req.params.id;
 
     try {
         let userDB = await User.findById(id);
         if(!userDB){
-            return  res.status(HttpStatusCodeEnum.NOT_FOUND).json({
+            return res.status(HttpStatusCodeEnum.NOT_FOUND).json({
                 ok:false,
                 msg: `No existe ningún usuario con el id ${id}`
             })
+        }
+
+        userDB = await User.findOne({ email });
+    
+        // KO -> existe un usuario con ese email
+        if(userDB && userDB._id != id) {
+            return res.status(HttpStatusCodeEnum.BAD_REQUEST).json({
+                ok: false,
+                msg:"Ya existe un usuario con este email"
+            });
         }
     
         userDB = await User.findOne({ username });
     
         // KO -> existe un usuario con ese nombre
         if(userDB && userDB._id != id) {
-            return  res.status(HttpStatusCodeEnum.BAD_REQUEST).json({
+            return res.status(HttpStatusCodeEnum.BAD_REQUEST).json({
                 ok: false,
                 msg:"Ya existe un usuario con este nombre"
             });
         }
     
         object.email = email;
+        object.username = username;
         const user = await User.findByIdAndUpdate(id, object, { new: true }); 
     
         res.json({
@@ -87,7 +109,7 @@ export const updateUser = async(req, res = response) => {
 export const updatePassword = async(req, res = response) => {
 
     const id = req.params.id;
-    const { oldPassword, newPassword, newPassword2 } = req.body;
+    const { currentPassword, newPassword, confirmPassword } = req.body;
 
     try {
 
@@ -99,7 +121,7 @@ export const updatePassword = async(req, res = response) => {
             })
         }
 
-        const validPassword = bcrypt.compareSync(oldPassword, userDB.password);
+        const validPassword = bcrypt.compareSync(currentPassword, userDB.password);
 
         if (!validPassword) {
             return res.status(HttpStatusCodeEnum.BAD_REQUEST).json({
@@ -108,7 +130,7 @@ export const updatePassword = async(req, res = response) => {
             })
         }
 
-        if (newPassword !== newPassword2) {
+        if (newPassword !== confirmPassword) {
             return  res.status(HttpStatusCodeEnum.BAD_REQUEST).json({
                 ok:false,
                 msg: "Las contraseñas no coinciden"

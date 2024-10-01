@@ -88,7 +88,7 @@ export const createWeightRecord = async(req, res = response) => {
     const { user, ...object } = req.body;
 
     try {
-
+        
         const userDB = await User.findById(user);
         if (!userDB) {
             return res.status(HttpStatusCodeEnum.NOT_FOUND).json({

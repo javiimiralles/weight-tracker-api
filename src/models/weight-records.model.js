@@ -15,7 +15,7 @@ const WeightRecordSchema = Schema(
             ref: 'User',
             required: true
         } 
-    }, { collection: 'users' }
+    }, { collection: 'weightRecords' }
 )
 
 WeightRecordSchema.method('toJSON', function(){

@@ -75,6 +75,7 @@ export const renewToken = async(req, res = response) => {
             msg: 'Token renovado',
             _id: uid,
             username: userDB.username,
+            email: userDB.email,
             gender: userDB.gender,
             height: userDB.height,
             age: userDB.age,
